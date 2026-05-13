@@ -14,20 +14,19 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar Docker Compose
+      - name: Criar diretórios de volumes
+        # CRITICAL: Isso deve vir antes de qualquer comando 'docker compose'
+        # para evitar o erro de caminho não encontrado (Exit Code 100)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
+          mkdir -p data/mysql
+          mkdir -p data/grafana
+          echo "✅ Diretórios de persistência criados."
 
       - name: Validar sintaxe do Docker Compose
         run: docker compose config --quiet
 
-      - name: Criar diretórios de volumes
-        run: |
-          mkdir -p data/mysql
-          mkdir -p data/grafana
-
-      - name: Testar build/pull das imagens
+      - name: Testar pull das imagens
+        # Isso garante que todas as imagens (Zabbix, MySQL, Grafana) existem e estão acessíveis
         run: docker compose pull --quiet
 
       - name: Testar inicialização (dry-run)
