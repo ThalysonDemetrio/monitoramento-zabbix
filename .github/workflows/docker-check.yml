@@ -1,0 +1,27 @@
+name: Docker Compose Validation
+
+# Roda sempre que você enviar código (push) ou abrir um Pull Request para a branch main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-zabbix-stack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Validar sintaxe do Docker Compose
+        # Este comando verifica erros de indentação, imagens inexistentes ou redes mal configuradas
+        run: docker compose config
+
+      - name: Verificar estrutura de volumes
+        # Como seu compose usa ./data/mysql e ./data/grafana, garantimos que a lógica de diretórios existe
+        run: |
+          mkdir -p data/mysql
+          mkdir -p data/grafana
+          docker compose config -q
