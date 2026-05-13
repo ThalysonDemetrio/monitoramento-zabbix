@@ -30,7 +30,7 @@ jobs:
         run: docker compose pull --quiet
 
       - name: Testar inicialização (dry-run)
-        run: docker compose up --no-start --quiet
+        run: docker compose up --no-start 
 
       - name: Validar rede e dependências
         run: |
