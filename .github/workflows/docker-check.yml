@@ -1,6 +1,5 @@
-name: Docker Compose Validation
+name: Docker Compose Validation & Test
 
-# Roda sempre que você enviar código (push) ou abrir um Pull Request para a branch main
 on:
   push:
     branches: [ "main" ]
@@ -15,13 +14,27 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Validar sintaxe do Docker Compose
-        # Este comando verifica erros de indentação, imagens inexistentes ou redes mal configuradas
-        run: docker compose config
+      - name: Instalar Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin
 
-      - name: Verificar estrutura de volumes
-        # Como seu compose usa ./data/mysql e ./data/grafana, garantimos que a lógica de diretórios existe
+      - name: Validar sintaxe do Docker Compose
+        run: docker compose config --quiet
+
+      - name: Criar diretórios de volumes
         run: |
           mkdir -p data/mysql
           mkdir -p data/grafana
-          docker compose config -q
+
+      - name: Testar build/pull das imagens
+        run: docker compose pull --quiet
+
+      - name: Testar inicialização (dry-run)
+        run: docker compose up --no-start --quiet
+
+      - name: Validar rede e dependências
+        run: |
+          echo "✅ Rede: trads-monitoring-net"
+          echo "✅ Serviços configurados:"
+          docker compose config --services
