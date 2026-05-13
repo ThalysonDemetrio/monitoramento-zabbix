@@ -1,0 +1,11 @@
+# Dados persistentes
+/data
+
+# Logs
+*.log
+
+# Variáveis de ambiente
+.env
+
+# Arquivos temporários
+*.tmp
